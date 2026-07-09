@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+outputs/
+*.pth
+*.pt
+.DS_Store
+dataset/
+report.html
+.vscode/
+coding_action_plan.md
+project_summary.md
+sar2eo_approach.md
+task.md

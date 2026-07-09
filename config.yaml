@@ -1,0 +1,59 @@
+# Training & model configuration
+
+experiment:
+  name: "exp_B_l1_gan"
+  seed: 42
+  device: "cuda"
+  num_workers: 2
+  pin_memory: true
+
+data:
+  root_dir: "./dataset"
+  classes: ["agri", "barrenland", "grassland", "urban"]
+  split_ratios: [0.8, 0.1, 0.1]  # train / val / test
+  image_size: 256
+  sar_channels: 1
+  eo_channels: 3
+
+training:
+  epochs: 200
+  batch_size: 16
+  lr_generator: 0.0002
+  lr_discriminator: 0.0002
+  beta1: 0.5
+  beta2: 0.999
+  lambda_l1: 100.0
+  lr_schedule:
+    type: "linear_decay"
+    decay_start_epoch: 100
+  log_interval: 10  # log every N batches
+  val_interval: 5  # validate every N epochs
+  save_last_every: 10  # save gen_last.pth every N epochs (for resumption)
+
+model:
+  generator:
+    type: "unet"
+    base_filters: 64
+    num_layers: 8  # encoder/decoder depth
+    use_dropout: true
+    dropout_rate: 0.5
+  discriminator:
+    type: "patchgan"
+    base_filters: 64
+    num_layers: 4
+
+loss:
+  type: "bce_and_l1"
+  bce_weight: 1.0
+  l1_weight: 100.0
+
+inference:
+  normalize_sar: "minmax_01"  # normalize [0,255] to [-1,1]
+  normalize_eo: "minmax_01"   # output [-1,1] → [0,255]
+  output_format: "png"
+  output_dtype: "uint8"
+
+evaluation:
+  metrics: ["lpips", "fid", "ssim", "psnr"]
+  num_qualitative_samples: 10
+  fid_batch_size: 50
